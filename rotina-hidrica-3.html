@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0E4B54">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rotina">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Rotina Hídrica</title>
+<style>
+  :root{
+    --ink:#0E3B44; --ink-soft:#3B6570;
+    --aqua:#0FA0A6; --aqua-deep:#0E7A80; --aqua-soft:#DCF0F0;
+    --bg:#EEF6F6; --card:#FFFFFF; --line:#DCE9E9;
+    --coral:#E2604B; --coral-soft:#FBE7E2;
+    --amber:#D9922E; --amber-soft:#FBEFD9;
+    --green:#2E9C63; --green-soft:#E1F2E8;
+    --shadow:0 2px 10px rgba(14,59,68,.07);
+    --r:16px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--ink);
+    font-size:16px; line-height:1.4;
+    padding-bottom:78px; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:540px;margin:0 auto;padding:0 14px}
+  h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.01em}
+  button{font-family:inherit;cursor:pointer;border:none;background:none}
+  input,textarea,select{font-family:inherit;font-size:16px}
+
+  /* Header */
+  header{
+    background:linear-gradient(135deg,#0E4B54,#0E7A80);
+    color:#fff;padding:16px 14px 18px;
+    border-radius:0 0 22px 22px;box-shadow:var(--shadow);
+  }
+  .head-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .head-top h1{font-size:19px;color:#fff}
+  .head-sub{font-size:12.5px;opacity:.85;margin-top:2px}
+  .resp-pick{display:flex;gap:6px;margin-top:12px}
+  .resp-pick button{
+    flex:1;padding:7px 4px;border-radius:10px;font-size:13px;font-weight:700;
+    background:rgba(255,255,255,.15);color:#fff;border:1.5px solid transparent;
+  }
+  .resp-pick button.on{background:#fff;color:var(--aqua-deep);border-color:#fff}
+
+  /* Water bar */
+  .water{margin-top:14px;background:rgba(255,255,255,.12);border-radius:14px;padding:12px 14px}
+  .water-top{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;opacity:.95}
+  .water-top b{font-size:22px;font-weight:800}
+  .water-track{height:12px;background:rgba(255,255,255,.22);border-radius:8px;margin-top:9px;overflow:hidden}
+  .water-fill{height:100%;width:0;background:linear-gradient(90deg,#5FD6DA,#BDF3F0);border-radius:8px;transition:width .4s ease}
+  .water-note{font-size:11.5px;opacity:.8;margin-top:6px}
+
+  /* AGORA card */
+  .now{
+    background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);
+    margin-top:16px;padding:16px;border:2px solid var(--aqua);
+  }
+  .now.crucial{border-color:var(--coral)}
+  .now-eyebrow{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:800;
+    text-transform:uppercase;letter-spacing:.08em;color:var(--aqua-deep)}
+  .now.crucial .now-eyebrow{color:var(--coral)}
+  .now-eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--aqua);
+    animation:pulse 1.6s infinite}
+  .now.crucial .now-eyebrow .dot{background:var(--coral)}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(1.4)}}
+  .now-time{font-size:34px;font-weight:800;letter-spacing:-.02em;margin:6px 0 2px}
+  .now-time small{font-size:15px;font-weight:700;color:var(--aqua-deep);margin-left:8px}
+  .now-action{font-size:16px;font-weight:700;margin-bottom:3px}
+  .now-guide{font-size:13.5px;color:var(--ink-soft);margin-bottom:12px}
+  .now-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .qbtn{padding:12px 8px;border-radius:12px;font-weight:800;font-size:14px;
+    display:flex;align-items:center;justify-content:center;gap:6px;border:2px solid var(--line);
+    background:#fff;color:var(--ink)}
+  .qbtn.on{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+  .qbtn.water-b.on{background:var(--aqua-soft);border-color:var(--aqua);color:var(--aqua-deep)}
+  .now-mini{display:flex;gap:8px;margin-top:8px}
+  .now-mini button{flex:1;padding:10px;border-radius:11px;font-weight:700;font-size:13px;
+    background:var(--aqua-soft);color:var(--aqua-deep);display:flex;align-items:center;justify-content:center;gap:5px}
+  .now-mini button.wa{background:#25D366;color:#fff}
+  .now-done{text-align:center;color:var(--green);font-weight:800;font-size:15px;padding:8px 0}
+
+  /* Section titles */
+  .sec-title{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--ink-soft);margin:22px 4px 10px}
+
+  /* Timeline slot cards */
+  .slot{background:var(--card);border-radius:14px;box-shadow:var(--shadow);
+    margin-bottom:9px;padding:12px 13px;border-left:4px solid var(--line);opacity:.97}
+  .slot.crucial{border-left-color:var(--coral)}
+  .slot.current{border-left-color:var(--aqua);box-shadow:0 0 0 2px var(--aqua)}
+  .slot.done{background:#F6FBFA}
+  .slot-head{display:flex;align-items:center;gap:10px}
+  .slot-time{font-size:17px;font-weight:800;min-width:52px}
+  .slot-info{flex:1;min-width:0}
+  .slot-action{font-size:14px;font-weight:700;line-height:1.25}
+  .slot-ml{font-size:12px;color:var(--aqua-deep);font-weight:700}
+  .tag-crucial{display:inline-block;background:var(--coral-soft);color:var(--coral);
+    font-size:10px;font-weight:800;padding:1px 6px;border-radius:6px;margin-left:6px;vertical-align:middle}
+  .slot-guide{font-size:12.5px;color:var(--ink-soft);margin-top:7px}
+  .slot-controls{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .ctl{padding:8px 10px;border-radius:10px;font-size:12.5px;font-weight:700;
+    border:1.6px solid var(--line);background:#fff;color:var(--ink-soft);display:flex;align-items:center;gap:5px}
+  .ctl.on-water{background:var(--aqua-soft);border-color:var(--aqua);color:var(--aqua-deep)}
+  .ctl.on-yes{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+  .ctl.on-no{background:var(--coral-soft);border-color:var(--coral);color:var(--coral)}
+  .ctl.on-dry{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+  .ctl.on-wet{background:var(--amber-soft);border-color:var(--amber);color:var(--amber)}
+  .ctl.photo.has{background:var(--aqua-soft);border-color:var(--aqua);color:var(--aqua-deep)}
+  .ml-edit{display:inline-flex;align-items:center;gap:3px;font-size:12.5px;font-weight:700;color:var(--aqua-deep);
+    background:var(--aqua-soft);border:1.6px solid var(--aqua);border-radius:10px;padding:4px 8px}
+  .ml-edit input{width:46px;border:none;background:transparent;font-weight:800;color:var(--aqua-deep);text-align:right;font-size:14px;padding:0}
+  .ml-edit input:focus{outline:none}
+  .edit-hint{font-size:11px;color:var(--ink-soft);margin-top:7px;font-style:italic}
+  .slot-obs{width:100%;margin-top:8px;border:1.5px solid var(--line);border-radius:10px;
+    padding:8px 10px;font-size:13px;color:var(--ink);resize:vertical;min-height:20px;background:#fff}
+  .thumb{margin-top:8px;display:none}
+  .thumb img{max-width:100%;border-radius:10px;display:block}
+  .thumb.show{display:block}
+  .thumb button{margin-top:5px;font-size:11.5px;color:var(--coral);font-weight:700}
+
+  /* Generic card */
+  .card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:15px;margin-bottom:12px}
+  .card h3{font-size:15px;margin-bottom:10px}
+  label.fld{display:block;font-size:12.5px;font-weight:700;color:var(--ink-soft);margin:10px 0 5px}
+  .inp{width:100%;border:1.5px solid var(--line);border-radius:11px;padding:11px 12px;font-size:15px;color:var(--ink);background:#fff}
+  textarea.inp{resize:vertical;min-height:70px}
+
+  /* Sinais de alerta */
+  .alert{background:var(--coral-soft);border-radius:var(--r);padding:14px 15px;margin-bottom:12px;
+    border:1.5px solid #F3C9C0}
+  .alert h3{color:var(--coral);font-size:14px;display:flex;align-items:center;gap:7px}
+  .alert p{font-size:12.5px;color:#8A3327;margin:8px 0 0;line-height:1.45}
+  .sinais{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+  .sinal{padding:8px 11px;border-radius:20px;font-size:12.5px;font-weight:700;
+    background:#fff;color:var(--ink-soft);border:1.6px solid #EAD3CE}
+  .sinal.on{background:var(--coral);color:#fff;border-color:var(--coral)}
+
+  /* Guia cards */
+  .guia{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:14px;margin-bottom:10px}
+  .guia h4{margin:0 0 6px;font-size:14px;font-weight:800;color:var(--aqua-deep)}
+  .guia p{margin:0;font-size:13px;color:var(--ink-soft);line-height:1.5}
+  .guia b{color:var(--ink)}
+
+  /* Coco list */
+  .coco-item{display:flex;gap:8px;align-items:center;background:#F6FBFA;border-radius:10px;padding:9px 11px;margin-bottom:7px;font-size:13px}
+  .coco-item .x{margin-left:auto;color:var(--coral);font-weight:800;padding:2px 6px}
+  .coco-add{display:flex;gap:7px;margin-top:8px}
+  .coco-add input,.coco-add select{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:10px;padding:9px;font-size:14px;background:#fff}
+  .coco-add button{background:var(--aqua);color:#fff;border-radius:10px;padding:0 16px;font-weight:800}
+
+  .btn-primary{width:100%;background:var(--aqua);color:#fff;border-radius:12px;padding:14px;font-weight:800;font-size:15px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn-wa{width:100%;background:#25D366;color:#fff;border-radius:12px;padding:14px;font-weight:800;font-size:15px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px}
+  .btn-ghost{width:100%;background:#fff;color:var(--ink-soft);border:1.5px solid var(--line);border-radius:12px;padding:12px;font-weight:700;font-size:14px;margin-top:8px}
+
+  /* History */
+  .hist-day{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:13px 15px;margin-bottom:9px}
+  .hist-day .hd{display:flex;justify-content:space-between;align-items:center}
+  .hist-day .hd b{font-size:15px}
+  .hist-bars{display:flex;gap:3px;margin-top:9px}
+  .hist-bars span{flex:1;height:22px;border-radius:4px;background:var(--line)}
+  .hist-bars span.ok{background:var(--aqua)}
+  .hist-bars span.miss{background:var(--coral-soft)}
+  .hist-meta{font-size:12px;color:var(--ink-soft);margin-top:8px;display:flex;gap:12px;flex-wrap:wrap}
+  .hist-flag{color:var(--coral);font-weight:700}
+
+  /* Editor de horários */
+  .sched-row{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:12px;margin-bottom:9px;
+    border-left:4px solid var(--aqua)}
+  .sched-row.crucial{border-left-color:var(--coral)}
+  .sched-top{display:flex;gap:8px;align-items:center}
+  .sched-top input[type=time]{border:1.5px solid var(--line);border-radius:10px;padding:8px;font-size:16px;font-weight:800;color:var(--ink);background:#fff}
+  .sched-ml{width:76px;border:1.5px solid var(--line);border-radius:10px;padding:8px;font-size:14px;text-align:right;background:#fff}
+  .sched-ml-lbl{font-size:12px;color:var(--ink-soft);font-weight:700}
+  .sched-del{margin-left:auto;color:var(--coral);font-weight:800;font-size:20px;padding:2px 8px}
+  .sched-act{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:9px 10px;font-size:14px;color:var(--ink);margin-top:8px;background:#fff}
+  .sched-flags{display:flex;gap:8px;margin-top:8px}
+  .sched-flag{flex:1;padding:8px;border-radius:10px;font-size:12px;font-weight:700;border:1.6px solid var(--line);background:#fff;color:var(--ink-soft)}
+  .sched-flag.on{background:var(--coral-soft);border-color:var(--coral);color:var(--coral)}
+  .sched-flag.alarm.on{background:var(--aqua-soft);border-color:var(--aqua);color:var(--aqua-deep)}
+  .sched-total{text-align:center;font-size:13px;font-weight:700;color:var(--aqua-deep);background:var(--aqua-soft);border-radius:10px;padding:9px;margin:4px 0 12px}
+  .clock-link{display:flex;align-items:center;gap:10px;background:#F6FBFA;border:1.5px solid var(--line);border-radius:11px;padding:11px 13px;margin-top:7px;text-decoration:none;color:var(--ink);font-weight:700;font-size:14px}
+  .clock-link .t{font-size:16px;font-weight:800;color:var(--aqua-deep);min-width:52px}
+  .clock-link .a{font-size:12.5px;color:var(--ink-soft);font-weight:600}
+  .clock-link .go{margin-left:auto;color:var(--aqua)}
+  nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);
+    display:flex;box-shadow:0 -2px 12px rgba(14,59,68,.06);z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+  nav button{flex:1;padding:9px 1px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;
+    color:var(--ink-soft);font-size:9.5px;font-weight:700}
+  nav button .ic{font-size:19px;line-height:1}
+  nav button.on{color:var(--aqua)}
+  .view{display:none;padding-top:6px}
+  .view.on{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .empty{text-align:center;color:var(--ink-soft);font-size:13.5px;padding:30px 20px}
+  .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#fff;padding:11px 18px;border-radius:24px;font-size:13.5px;font-weight:700;
+    opacity:0;pointer-events:none;transition:.3s;z-index:99;box-shadow:var(--shadow);max-width:90%;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .disclaimer{font-size:11px;color:var(--ink-soft);text-align:center;padding:14px 20px 4px;line-height:1.5}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="head-top">
+      <div>
+        <h1 id="hTitle">Rotina Hídrica</h1>
+        <div class="head-sub" id="hDate">—</div>
+      </div>
+      <div style="text-align:right">
+        <div class="head-sub" style="opacity:.9">Dia do antibiótico</div>
+        <input id="antibDay" class="head-sub" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:4px 8px;width:96px;text-align:right;margin-top:3px" placeholder="ex: 3 de 10">
+      </div>
+    </div>
+
+    <div class="resp-pick" id="respPick">
+      <button data-r="Pai">👨 Pai</button>
+      <button data-r="Mãe">👩 Mãe</button>
+      <button data-r="Outro">Outro</button>
+    </div>
+
+    <div class="water">
+      <div class="water-top">
+        <span>💧 Água de hoje</span>
+        <span><b id="wNow">0</b> / <span id="wTotal">1140</span> ml</span>
+      </div>
+      <div class="water-track"><div class="water-fill" id="wFill"></div></div>
+      <div class="water-note" id="wNote">Meta: 1,1 L a 1,3 L por dia</div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ========== HOJE ========== -->
+  <section class="view on" id="v-hoje">
+    <div class="now" id="nowCard"><!-- preenchido via JS --></div>
+    <div class="sec-title">Linha do dia</div>
+    <div id="timeline"></div>
+  </section>
+
+  <!-- ========== REGISTROS ========== -->
+  <section class="view" id="v-reg">
+    <div class="alert">
+      <h3>⚠️ Sinais de alerta — avaliação médica imediata</h3>
+      <p>Marque o que observou. Urina turva ou com <b>cheiro forte de amônia</b>, febre ≥ 37,8 °C, choro/dor ao urinar, recusa alimentar, prostração ou sangue no xixi — procure atendimento.</p>
+      <div class="sinais" id="sinais">
+        <button class="sinal" data-s="odor">Odor de amônia</button>
+        <button class="sinal" data-s="turva">Urina turva</button>
+        <button class="sinal" data-s="febre">Febre ≥ 37,8°</button>
+        <button class="sinal" data-s="dor">Dor ao urinar</button>
+        <button class="sinal" data-s="recusa">Recusa alimentar</button>
+        <button class="sinal" data-s="prostracao">Prostração</button>
+        <button class="sinal" data-s="sangue">Sangue no xixi</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>💩 Registro de evacuação</h3>
+      <div id="cocoList"></div>
+      <div class="coco-add">
+        <input type="time" id="cocoHora">
+        <select id="cocoCons">
+          <option value="Pastoso">Pastoso</option>
+          <option value="Normal" selected>Normal</option>
+          <option value="Ressecado">Ressecado</option>
+        </select>
+        <button id="cocoAdd">+</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📝 Intercorrências e queixas de dor</h3>
+      <textarea class="inp" id="intercorr" placeholder="Anote queixas, dor durante o dia, comportamento, o que chamou atenção…"></textarea>
+    </div>
+  </section>
+
+  <!-- ========== HISTÓRICO ========== -->
+  <section class="view" id="v-hist">
+    <div class="sec-title">Dias registrados</div>
+    <div id="histList"></div>
+  </section>
+
+  <!-- ========== HORÁRIOS ========== -->
+  <section class="view" id="v-horarios">
+    <div class="sec-title">Editar horários da rotina</div>
+    <div id="schedEditor"></div>
+    <button class="btn-ghost" id="schedAdd" style="margin-top:4px">＋ Adicionar horário</button>
+    <button class="btn-ghost" id="schedReset" style="color:var(--ink-soft)">↺ Voltar aos horários originais do plano</button>
+
+    <div class="card" style="margin-top:18px">
+      <h3>⏰ Gerar os alarmes neste aparelho</h3>
+      <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 12px;line-height:1.5">Depois de ajustar os horários, gere os alarmes. Isso mexe só neste celular — o aparelho da sua esposa continua com os horários dela.</p>
+
+      <button class="btn-primary" id="genICS" style="margin-bottom:6px">📅 Baixar agenda de alarmes (recorrente)</button>
+      <p style="font-size:11.5px;color:var(--ink-soft);margin:0 0 16px;line-height:1.5">Abra o arquivo baixado e escolha <b>adicionar ao Google Agenda</b>. Cria todos os horários como lembretes <b>diários com notificação</b>, de uma vez. Funciona no Android e no iPhone.</p>
+
+      <button class="btn-ghost" id="genClock">🔔 Criar alarme no Relógio (Android)</button>
+      <p style="font-size:11.5px;color:var(--ink-soft);margin:8px 0 0;line-height:1.5">Abre uma lista com um botão por horário. Cada toque abre o Relógio já preenchido — você só confirma. É o mais perto de alarme sonoro que o navegador permite.</p>
+      <div id="clockLinks"></div>
+    </div>
+
+    <div class="alert" style="background:var(--amber-soft);border-color:#F0DBB0">
+      <h3 style="color:var(--amber)">⚠️ Sobre os alarmes que já criei pra você</h3>
+      <p style="color:#7A5A1E">Os 13 alarmes que configurei no seu celular pela nossa conversa continuam lá. Se você editar os horários aqui e gerar de novo, apague os antigos no app Relógio pra não tocar em dobro.</p>
+    </div>
+  </section>
+
+  <!-- ========== GUIA ========== -->
+  <section class="view" id="v-guia">
+    <div class="sec-title">Diretrizes para eliminar a Proteus</div>
+    <div class="guia"><h4>1. Higiene sempre da frente para trás</h4><p>A Proteus vem do intestino. Toda limpeza (vaso, troca de fralda, banho) <b>da vagina em direção ao ânus</b>. Nunca traga a sujeira do ânus para a região da uretra.</p></div>
+    <div class="guia"><h4>2. Apoio firme para os pés</h4><p>Perna pendurada faz a criança contrair e não esvaziar a bexiga. Use redutor de assento + <b>banquinho</b>, joelhos dobrados a 90°.</p></div>
+    <div class="guia"><h4>3. Xixi duplo (double voiding)</h4><p>Depois do xixi, não tire na hora. Peça pra ela cantar 10–15s ou soprar bolinhas de sabão e <b>tentar de novo</b>. Isso elimina a urina que ficou.</p></div>
+    <div class="guia"><h4>4. Cuidados no banho</h4><p><b>Chuveiro</b>, não banheira. Evite espuma e sabonete com cheiro forte — irritam e ajudam a bactéria a subir. Use sabonete neutro infantil.</p></div>
+    <div class="disclaimer">Plano preventivo de apoio à rotina doméstica. Não substitui as orientações, retornos e prescrições do pediatra ou nefrologista pediátrico.</div>
+  </section>
+
+  <!-- ========== CONFIG ========== -->
+  <section class="view" id="v-config">
+    <div class="card">
+      <h3>⚙️ Ajustes</h3>
+      <label class="fld">Nome da criança</label>
+      <input class="inp" id="cfgName" placeholder="Ex: Alice">
+      <label class="fld">Meta mínima (ml)</label>
+      <input class="inp" id="cfgMin" type="number" value="1100">
+      <label class="fld">Meta máxima (ml)</label>
+      <input class="inp" id="cfgMax" type="number" value="1300">
+      <label class="fld">WhatsApp do parceiro(a) — opcional (com DDD, só números)</label>
+      <input class="inp" id="cfgWa" type="tel" inputmode="numeric" placeholder="Ex: 5511987654321">
+      <button class="btn-primary" style="margin-top:16px" id="cfgSave">Salvar ajustes</button>
+    </div>
+    <div class="card">
+      <h3>🗂️ Dados e backup</h3>
+      <p style="font-size:13px;color:var(--ink-soft);margin:0 0 10px">Tudo fica salvo neste aparelho, offline. Nada vai pra internet. Salva automático a cada toque.</p>
+      <div id="storeStatus" style="font-size:12.5px;background:var(--aqua-soft);color:var(--aqua-deep);border-radius:10px;padding:9px 11px;margin-bottom:12px;font-weight:600">Verificando armazenamento…</div>
+      <button class="btn-ghost" id="btnExport">⬇️ Baixar backup completo (registros + fotos)</button>
+      <button class="btn-ghost" id="btnImport">⬆️ Restaurar backup de um arquivo</button>
+      <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+      <p style="font-size:11.5px;color:var(--ink-soft);margin:12px 0 0;line-height:1.5">💡 Dica: baixe o backup de vez em quando e guarde no Google Drive ou mande no WhatsApp. É assim que você e sua esposa passam os dados de um celular pro outro — é só restaurar no outro aparelho.</p>
+      <button class="btn-ghost" id="btnReset" style="color:var(--coral);border-color:#EAD3CE;margin-top:14px">Zerar registros de hoje</button>
+    </div>
+  </section>
+
+  <!-- Fixed WhatsApp/report bar within Hoje/Reg -->
+  <div id="waZone" style="margin:18px 0 8px">
+    <button class="btn-wa" id="btnWaReport">📲 Enviar resumo do dia no WhatsApp</button>
+    <button class="btn-ghost" id="btnCopy">Copiar resumo como texto</button>
+  </div>
+
+</div>
+
+<nav>
+  <button class="on" data-v="hoje"><span class="ic">💧</span>Hoje</button>
+  <button data-v="reg"><span class="ic">📝</span>Registros</button>
+  <button data-v="hist"><span class="ic">📊</span>Histórico</button>
+  <button data-v="horarios"><span class="ic">⏰</span>Horários</button>
+  <button data-v="guia"><span class="ic">📖</span>Guia</button>
+  <button data-v="config"><span class="ic">⚙️</span>Ajustes</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+/* Detector de erro visível (ajuda a diagnosticar no iPhone) */
+window.addEventListener("error",function(ev){
+  var b=document.getElementById("errbar");
+  if(!b){ b=document.createElement("div"); b.id="errbar";
+    b.style.cssText="position:fixed;bottom:78px;left:8px;right:8px;background:#B00020;color:#fff;padding:10px 12px;border-radius:10px;font:600 12px -apple-system,sans-serif;z-index:9999;white-space:pre-wrap;box-shadow:0 2px 10px rgba(0,0,0,.3)";
+    if(document.body) document.body.appendChild(b); }
+  b.textContent="⚠️ "+(ev.message||"erro")+(ev.lineno?" (linha "+ev.lineno+")":"");
+});
+
+/* ---------- Cronograma (do PDF) ---------- */
+const DEFAULT_SCHEDULE = [
+  {t:"08:00", ml:120, act:"Acordar + Vaso + troca de fralda", guide:"Levar direto ao banheiro. Trocar fralda noturna e higiene frente→trás.", crucial:false, bath:false},
+  {t:"09:00", ml:100, act:"Vaso + Xixi Duplo", guide:"Aguardar 10s no vaso antes de levantar (segunda tentativa).", crucial:false, bath:false},
+  {t:"10:00", ml:100, act:"Vaso + checar umidade", guide:"Checar umidade da calcinha/fralda. Estímulo lúdico, sem pressionar.", crucial:false, bath:false},
+  {t:"11:00", ml:100, act:"Vaso antes do almoço", guide:"Esvaziar a bexiga antes da refeição principal.", crucial:false, bath:false},
+  {t:"12:30", ml:100, act:"Vaso pós-almoço", guide:"Aproveitar o reflexo miccional pós-refeição. Apoio firme nos pés.", crucial:false, bath:false},
+  {t:"13:30", ml:50,  act:"Vaso pré-soneca", guide:"Esvaziar a bexiga antes de deitar. Pouca água agora.", crucial:true, bath:false},
+  {t:"15:30", ml:120, act:"Vaso pós-soneca + lanche", guide:"Ao acordar, ir ao banheiro IMEDIATAMENTE. Depois água + lanche.", crucial:true, bath:false},
+  {t:"16:30", ml:100, act:"Vaso", guide:"Manter o fluxo contínuo de lavagem hídrica da bexiga.", crucial:false, bath:false},
+  {t:"17:30", ml:100, act:"Vaso + higiene perineal", guide:"Incentivar micção completa. Checar higiene perineal.", crucial:false, bath:false},
+  {t:"18:30", ml:100, act:"Vaso + banho de chuveiro", guide:"Banho de chuveiro. Limpeza genital estritamente frente→trás.", crucial:false, bath:true},
+  {t:"19:30", ml:80,  act:"Vaso pós-jantar", guide:"Micção pós-jantar. Iniciar desaceleração de líquidos.", crucial:false, bath:false},
+  {t:"20:30", ml:50,  act:"Penúltimo vaso", guide:"Penúltima ida ao vaso antes da rotina de sono.", crucial:false, bath:false},
+  {t:"20:55", ml:20,  act:"Último vaso da noite", guide:"Esvaziamento total + fralda/pants noturna limpa.", crucial:true, bath:false}
+];
+let SCHEDULE, PLANNED;
+function loadSchedule(){
+  const cfg = DB.config.schedule;
+  SCHEDULE = (cfg && cfg.length) ? cfg.map(x=>({...x})) : DEFAULT_SCHEDULE.map(x=>({...x}));
+  SCHEDULE.sort((a,b)=>a.t.localeCompare(b.t));
+  PLANNED = SCHEDULE.reduce((s,x)=>s+(parseInt(x.ml)||0),0);
+}
+function saveSchedule(){
+  SCHEDULE.sort((a,b)=>a.t.localeCompare(b.t));
+  DB.config.schedule = SCHEDULE.map(x=>({...x}));
+  PLANNED = SCHEDULE.reduce((s,x)=>s+(parseInt(x.ml)||0),0);
+  save();
+}
+
+/* ---------- Persistência ---------- */
+const KEY="pm_rotina_v1";
+function load(){ try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}} }
+let storageOK=true;
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(DB)); storageOK=true; }catch(e){ storageOK=false; } }
+let DB = load();
+if(!DB.config) DB.config = {childName:"", metaMin:1100, metaMax:1300, wa:""};
+if(!DB.days) DB.days = {};
+loadSchedule();
+
+function todayKey(){
+  const d=new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function blankDay(){
+  const slots={};
+  SCHEDULE.forEach(s=>slots[s.t]={agua:false,xixi:null,escape:null,obs:""});
+  return {resp:"", antib:"", slots, coco:[], intercorr:"", sinais:{}};
+}
+function ensureSlots(dayObj){
+  if(!dayObj.slots) dayObj.slots={};
+  SCHEDULE.forEach(s=>{ if(!dayObj.slots[s.t]) dayObj.slots[s.t]={agua:false,xixi:null,escape:null,obs:""}; });
+  return dayObj;
+}
+function day(k){ k=k||todayKey(); if(!DB.days[k]) DB.days[k]=blankDay(); return ensureSlots(DB.days[k]); }
+let D = day();
+
+/* ---------- IndexedDB p/ fotos ---------- */
+let idb=null;
+(function openIDB(){
+  try{
+    if(!window.indexedDB) return;
+    const r=indexedDB.open("pm_fotos",1);
+    r.onupgradeneeded=e=>{ try{ e.target.result.createObjectStore("fotos"); }catch(_){} };
+    r.onsuccess=e=>{ idb=e.target.result; try{refreshThumbs();}catch(_){} };
+    r.onerror=()=>{ idb=null; };
+  }catch(e){ idb=null; }
+})();
+function photoKey(t){ return todayKey()+"__"+t; }
+function savePhoto(t,dataUrl,cb){
+  if(!idb)return; const tx=idb.transaction("fotos","readwrite");
+  tx.objectStore("fotos").put(dataUrl,photoKey(t)); tx.oncomplete=()=>cb&&cb();
+}
+function getPhoto(t,cb){
+  if(!idb){cb(null);return;} const tx=idb.transaction("fotos","readonly");
+  const rq=tx.objectStore("fotos").get(photoKey(t)); rq.onsuccess=()=>cb(rq.result||null); rq.onerror=()=>cb(null);
+}
+function delPhoto(t,cb){
+  if(!idb)return; const tx=idb.transaction("fotos","readwrite");
+  tx.objectStore("fotos").delete(photoKey(t)); tx.oncomplete=()=>cb&&cb();
+}
+
+/* ---------- Utils ---------- */
+const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
+function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._x); t._x=setTimeout(()=>t.classList.remove("show"),2200); }
+function nowMinutes(){ const d=new Date(); return d.getHours()*60+d.getMinutes(); }
+function toMin(t){ const[a,b]=t.split(":").map(Number); return a*60+b; }
+function fmtDate(){
+  const d=new Date(), dias=["domingo","segunda","terça","quarta","quinta","sexta","sábado"];
+  return dias[d.getDay()]+", "+String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear();
+}
+function currentSlotIndex(){
+  const n=nowMinutes(); let idx=-1;
+  for(let i=0;i<SCHEDULE.length;i++){ if(toMin(SCHEDULE[i].t)<=n+15) idx=i; }
+  // se antes do primeiro horário, aponta pro primeiro
+  if(idx<0 && n<toMin(SCHEDULE[0].t)) return 0;
+  return idx;
+}
+
+/* ---------- Água ---------- */
+function mlOf(st,x){ if(!st||!st.agua) return 0; return (st.mlDone==null? x.ml : st.mlDone); }
+function waterNow(){ return SCHEDULE.reduce((s,x)=>s+mlOf(D.slots[x.t],x),0); }
+function renderWater(){
+  const now=waterNow(), min=DB.config.metaMin, max=DB.config.metaMax;
+  $("#wNow").textContent=now; $("#wTotal").textContent=PLANNED;
+  const pct=Math.min(100, Math.round(now/PLANNED*100));
+  const fill=$("#wFill"); fill.style.width=pct+"%";
+  let msg="Meta: "+ (min/1000).toFixed(1).replace(".",",")+" L a "+(max/1000).toFixed(1).replace(".",",")+" L por dia";
+  if(now>=min && now<=max){ fill.style.background="linear-gradient(90deg,#5FD6DA,#BDF3F0)"; msg="✅ Dentro da meta ("+now+" ml)"; }
+  else if(now>max){ fill.style.background="linear-gradient(90deg,#4EC0F0,#9FE0FA)"; msg="Acima da meta — ok, observe o conforto dela"; }
+  else if(now>0){ fill.style.background="linear-gradient(90deg,#E6C25A,#F2DD8E)"; }
+  $("#wNote").textContent=msg;
+}
+
+/* ---------- Card AGORA ---------- */
+function renderNow(){
+  const idx=currentSlotIndex(), card=$("#nowCard");
+  if(idx<0){ card.innerHTML='<div class="now-done">🌙 Fora da janela de rotina (08:00–21:00). Bexiga vazia, bom descanso!</div>'; card.className="now"; return; }
+  const s=SCHEDULE[idx], st=D.slots[s.t];
+  card.className="now"+(s.crucial?" crucial":"");
+  const done = st.agua && st.xixi==="sim";
+  card.innerHTML=`
+    <div class="now-eyebrow"><span class="dot"></span>${s.crucial?"Momento crucial • agora":"Agora"}</div>
+    <div class="now-time">${s.t}<small>${s.ml?s.ml+" ml":""}</small></div>
+    <div class="now-action">${s.act}</div>
+    <div class="now-guide">${s.guide}</div>
+    <div class="now-actions">
+      <button class="qbtn water-b ${st.agua?"on":""}" data-q="agua">💧 ${st.agua?"Bebeu":"Marcar água"}</button>
+      <button class="qbtn ${st.xixi==="sim"?"on":""}" data-q="xixi">🚽 ${st.xixi==="sim"?"Fez xixi":"Fez xixi?"}</button>
+    </div>
+    <div class="now-mini">
+      <button data-q="foto">📷 Foto da checagem</button>
+      <button class="wa" data-q="waslot">📲 Avisar parceiro(a)</button>
+    </div>
+    ${done?'<div class="now-done" style="margin-top:8px">✔ Checagem das '+s.t+' concluída</div>':''}
+  `;
+  card.querySelector('[data-q="agua"]').onclick=()=>{ st.agua=!st.agua; if(st.agua&&st.mlDone==null)st.mlDone=s.ml; save(); renderAll(); toast(st.agua?"Água registrada 💧":"Água desmarcada"); };
+  card.querySelector('[data-q="xixi"]').onclick=()=>{ st.xixi = st.xixi==="sim"?null:"sim"; save(); renderAll(); };
+  card.querySelector('[data-q="foto"]').onclick=()=>pickPhoto(s.t);
+  card.querySelector('[data-q="waslot"]').onclick=()=>shareSlot(s);
+}
+
+/* ---------- Timeline ---------- */
+function renderTimeline(){
+  const cur=currentSlotIndex(), tl=$("#timeline"); tl.innerHTML="";
+  SCHEDULE.forEach((s,i)=>{
+    const st=D.slots[s.t];
+    const done = st.agua && st.xixi==="sim";
+    const el=document.createElement("div");
+    el.className="slot"+(s.crucial?" crucial":"")+(i===cur?" current":"")+(done?" done":"");
+    el.innerHTML=`
+      <div class="slot-head">
+        <div class="slot-time">${s.t}</div>
+        <div class="slot-info">
+          <div class="slot-action">${s.act}${s.crucial?'<span class="tag-crucial">CRUCIAL</span>':''}</div>
+          ${s.ml?'<div class="slot-ml">💧 '+s.ml+' ml</div>':''}
+        </div>
+      </div>
+      <div class="slot-guide">${s.guide}</div>
+      <div class="slot-controls">
+        <button class="ctl w ${st.agua?"on-water":""}" data-k="agua">💧 ${st.agua?"Bebeu":"Água"}</button>
+        ${st.agua?`<span class="ml-edit"><input type="number" inputmode="numeric" data-k="ml" value="${st.mlDone==null?s.ml:st.mlDone}"> ml</span>`:''}
+        <button class="ctl xy ${st.xixi==="sim"?"on-yes":""}" data-k="xsim">Xixi ✔</button>
+        <button class="ctl xn ${st.xixi==="nao"?"on-no":""}" data-k="xnao">Xixi ✗</button>
+        ${s.bath?'':`
+        <button class="ctl es ${st.escape==="seca"?"on-dry":""}" data-k="seca">Seca</button>
+        <button class="ctl ew ${st.escape==="escape"?"on-wet":""}" data-k="escape">Escape</button>`}
+        <button class="ctl photo" data-k="foto">📷 Foto</button>
+      </div>
+      ${st.agua||st.xixi||st.escape?'<div class="edit-hint">Tocou sem querer? Toque de novo no mesmo botão para desmarcar.</div>':''}
+      <textarea class="slot-obs" data-k="obs" placeholder="Odor, cor, dor…">${st.obs||""}</textarea>
+      <div class="thumb" data-thumb="${s.t}"></div>
+    `;
+    el.querySelector('[data-k="agua"]').onclick=e=>{ st.agua=!st.agua; if(st.agua&&st.mlDone==null)st.mlDone=s.ml; save(); renderAll(); };
+    const mlIn=el.querySelector('[data-k="ml"]');
+    if(mlIn){ mlIn.onchange=e=>{ let v=parseInt(e.target.value); if(isNaN(v)||v<0)v=0; st.mlDone=v; save(); renderWater(); renderNow(); toast("Quantidade ajustada"); }; }
+    el.querySelector('[data-k="xsim"]').onclick=e=>{ st.xixi=st.xixi==="sim"?null:"sim"; save(); renderAll(); };
+    el.querySelector('[data-k="xnao"]').onclick=e=>{ st.xixi=st.xixi==="nao"?null:"nao"; save(); renderAll(); };
+    const seca=el.querySelector('[data-k="seca"]'), esc=el.querySelector('[data-k="escape"]');
+    if(seca) seca.onclick=e=>{ st.escape=st.escape==="seca"?null:"seca"; save(); renderAll(); };
+    if(esc) esc.onclick=e=>{ st.escape=st.escape==="escape"?null:"escape"; save(); renderAll(); };
+    el.querySelector('[data-k="foto"]').onclick=()=>pickPhoto(s.t);
+    el.querySelector('[data-k="obs"]').oninput=e=>{ st.obs=e.target.value; save(); };
+    tl.appendChild(el);
+  });
+  refreshThumbs();
+}
+// fix stray char in xixi ✗ label
+function fixLabels(){ $$('.ctl.xn').forEach(b=>b.textContent="Xixi ✗"); }
+
+/* ---------- Fotos ---------- */
+let photoInput=document.createElement("input");
+photoInput.type="file"; photoInput.accept="image/*"; photoInput.capture="environment";
+let photoTarget=null;
+photoInput.onchange=()=>{
+  const f=photoInput.files[0]; if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    // reduz tamanho p/ economizar espaço
+    const img=new Image();
+    img.onload=()=>{
+      const max=1000, sc=Math.min(1,max/Math.max(img.width,img.height));
+      const cv=document.createElement("canvas");
+      cv.width=img.width*sc; cv.height=img.height*sc;
+      cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);
+      const url=cv.toDataURL("image/jpeg",.8);
+      savePhoto(photoTarget,url,()=>{ toast("Foto salva 📷"); refreshThumbs(); renderNow(); });
+    };
+    img.src=rd.result;
+  };
+  rd.readAsDataURL(f);
+  photoInput.value="";
+};
+function pickPhoto(t){ photoTarget=t; photoInput.click(); }
+function refreshThumbs(){
+  $$('[data-thumb]').forEach(box=>{
+    const t=box.getAttribute("data-thumb");
+    getPhoto(t,url=>{
+      if(url){
+        box.classList.add("show");
+        box.innerHTML=`<img src="${url}"><button data-del="${t}">🗑 Remover foto</button>`;
+        box.querySelector("[data-del]").onclick=()=>delPhoto(t,()=>{ box.classList.remove("show"); box.innerHTML=""; renderNow(); toast("Foto removida"); });
+      }else{ box.classList.remove("show"); box.innerHTML=""; }
+    });
+    // marca botão foto do slot
+    const slot=box.closest(".slot");
+    if(slot){ getPhoto(t,url=>{ const pb=slot.querySelector('[data-k="foto"]'); if(pb) pb.classList.toggle("has",!!url); }); }
+  });
+}
+
+/* ---------- Registros extras ---------- */
+function renderSinais(){ $$("#sinais .sinal").forEach(b=>b.classList.toggle("on", !!D.sinais[b.dataset.s])); }
+$$("#sinais .sinal").forEach(b=>b.onclick=()=>{ D.sinais[b.dataset.s]=!D.sinais[b.dataset.s]; save(); renderSinais(); });
+function renderCoco(){
+  const box=$("#cocoList"); box.innerHTML="";
+  if(!D.coco.length){ box.innerHTML='<div style="font-size:12.5px;color:var(--ink-soft)">Nenhum registro hoje.</div>'; return; }
+  D.coco.forEach((c,i)=>{
+    const el=document.createElement("div"); el.className="coco-item";
+    el.innerHTML=`<span>🕐 ${c.hora}</span> · <span>${c.cons}</span><button class="x" data-i="${i}">✕</button>`;
+    el.querySelector(".x").onclick=()=>{ D.coco.splice(i,1); save(); renderCoco(); };
+    box.appendChild(el);
+  });
+}
+$("#cocoAdd").onclick=()=>{
+  const h=$("#cocoHora").value|| new Date().toTimeString().slice(0,5);
+  D.coco.push({hora:h, cons:$("#cocoCons").value}); save(); $("#cocoHora").value=""; renderCoco(); toast("Registrado 💩");
+};
+$("#intercorr").oninput=e=>{ D.intercorr=e.target.value; save(); };
+
+/* ---------- Responsável / antibiótico ---------- */
+function renderResp(){ $$("#respPick button").forEach(b=>b.classList.toggle("on", b.dataset.r===D.resp)); }
+$$("#respPick button").forEach(b=>b.onclick=()=>{ D.resp=b.dataset.r; save(); renderResp(); });
+$("#antibDay").oninput=e=>{ D.antib=e.target.value; save(); };
+
+/* ---------- Resumo / WhatsApp ---------- */
+function buildReport(){
+  const name=DB.config.childName||"criança";
+  let out=`🩺 Rotina Hídrica — ${name}\n📅 ${fmtDate()}`;
+  if(D.antib) out+=`  •  Antibiótico dia ${D.antib}`;
+  if(D.resp) out+=`\n👤 Registrou: ${D.resp}`;
+  out+=`\n\n💧 Água: ${waterNow()} de ${PLANNED} ml\n\n`;
+  SCHEDULE.forEach(s=>{
+    const st=D.slots[s.t];
+    let mk = (st.agua?("💧"+mlOf(st,s)+"ml"):"·")+" "+(st.xixi==="sim"?"xixi✔":st.xixi==="nao"?"xixi✗":"–");
+    if(!s.bath && st.escape) mk+= st.escape==="escape"?" ⚠️escape":" seca";
+    out+=`${s.t}  ${mk}`;
+    if(st.obs) out+=`  (${st.obs})`;
+    out+="\n";
+  });
+  if(D.coco.length){ out+="\n💩 Cocô: "+D.coco.map(c=>`${c.hora} ${c.cons}`).join(" · ")+"\n"; }
+  const sin=Object.keys(D.sinais).filter(k=>D.sinais[k]);
+  const nomes={odor:"odor amônia",turva:"urina turva",febre:"febre",dor:"dor ao urinar",recusa:"recusa alimentar",prostracao:"prostração",sangue:"sangue"};
+  if(sin.length) out+=`\n⚠️ SINAIS: ${sin.map(k=>nomes[k]).join(", ").toUpperCase()}\n`;
+  if(D.intercorr) out+=`\n📝 ${D.intercorr}\n`;
+  return out.trim();
+}
+function waLink(text){
+  const num=(DB.config.wa||"").replace(/\D/g,"");
+  return num ? `https://wa.me/${num}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
+}
+$("#btnWaReport").onclick=()=>{
+  const txt=buildReport();
+  if(navigator.share){ navigator.share({text:txt}).catch(()=>window.open(waLink(txt),"_blank")); }
+  else window.open(waLink(txt),"_blank");
+};
+$("#btnCopy").onclick=async()=>{
+  try{ await navigator.clipboard.writeText(buildReport()); toast("Resumo copiado ✔"); }
+  catch(e){ window.open(waLink(buildReport()),"_blank"); }
+};
+function shareSlot(s){
+  const st=D.slots[s.t], name=DB.config.childName||"";
+  let txt=`💧 ${name} — ${s.t}\n${s.act}\n`;
+  txt+= (st.agua?"✔ bebeu água":"– sem água ainda")+" • "+(st.xixi==="sim"?"✔ fez xixi":st.xixi==="nao"?"✗ não fez":"xixi pendente");
+  if(st.obs) txt+=`\nObs: ${st.obs}`;
+  getPhoto(s.t, async(url)=>{
+    if(url && navigator.canShare){
+      try{
+        const blob=await (await fetch(url)).blob();
+        const file=new File([blob],`checagem-${s.t.replace(":","")}.jpg`,{type:"image/jpeg"});
+        if(navigator.canShare({files:[file]})){ await navigator.share({files:[file],text:txt}); return; }
+      }catch(e){}
+    }
+    if(navigator.share){ navigator.share({text:txt}).catch(()=>window.open(waLink(txt),"_blank")); }
+    else window.open(waLink(txt),"_blank");
+  });
+}
+
+/* ---------- Histórico ---------- */
+function renderHist(){
+  const box=$("#histList"); box.innerHTML="";
+  const keys=Object.keys(DB.days).sort().reverse();
+  if(!keys.length){ box.innerHTML='<div class="empty">Ainda sem dias registrados.<br>O dia de hoje aparece aqui quando você marcar algo.</div>'; return; }
+  keys.forEach(k=>{
+    const d=DB.days[k];
+    const water=SCHEDULE.reduce((s,x)=>s+mlOf(d.slots[x.t],x),0);
+    const xixiOk=SCHEDULE.filter(x=>d.slots[x.t]&&d.slots[x.t].xixi==="sim").length;
+    const escapes=SCHEDULE.filter(x=>d.slots[x.t]&&d.slots[x.t].escape==="escape").length;
+    const sinais=Object.keys(d.sinais||{}).filter(s=>d.sinais[s]).length;
+    const [y,m,dd]=k.split("-");
+    let bars=""; SCHEDULE.forEach(x=>{ const st=d.slots[x.t]||{}; bars+=`<span class="${st.agua&&st.xixi==="sim"?"ok":st.xixi==="nao"?"miss":""}"></span>`; });
+    const el=document.createElement("div"); el.className="hist-day";
+    el.innerHTML=`
+      <div class="hd"><b>${dd}/${m}/${y}</b><span style="font-size:12.5px;color:var(--aqua-deep);font-weight:700">💧 ${water} ml</span></div>
+      <div class="hist-bars">${bars}</div>
+      <div class="hist-meta">
+        <span>🚽 ${xixiOk}/${SCHEDULE.length} vasos</span>
+        ${escapes?`<span class="hist-flag">⚠️ ${escapes} escape(s)</span>`:''}
+        ${d.antib?`<span>💊 dia ${d.antib}</span>`:''}
+        ${sinais?`<span class="hist-flag">🚩 ${sinais} sinal(is)</span>`:''}
+      </div>`;
+    box.appendChild(el);
+  });
+}
+
+/* ---------- Config ---------- */
+function loadConfigUI(){
+  $("#cfgName").value=DB.config.childName||"";
+  $("#cfgMin").value=DB.config.metaMin; $("#cfgMax").value=DB.config.metaMax;
+  $("#cfgWa").value=DB.config.wa||"";
+}
+$("#cfgSave").onclick=()=>{
+  DB.config.childName=$("#cfgName").value.trim();
+  DB.config.metaMin=parseInt($("#cfgMin").value)||1100;
+  DB.config.metaMax=parseInt($("#cfgMax").value)||1300;
+  DB.config.wa=$("#cfgWa").value.replace(/\D/g,"");
+  save(); renderHeader(); renderWater(); toast("Ajustes salvos ✔");
+};
+function readAllPhotos(){
+  return new Promise(res=>{
+    const out={};
+    if(!idb){res(out);return;}
+    const tx=idb.transaction("fotos","readonly"), rq=tx.objectStore("fotos").openCursor();
+    rq.onsuccess=e=>{ const c=e.target.result; if(c){ out[c.key]=c.value; c.continue(); } else res(out); };
+    rq.onerror=()=>res(out);
+  });
+}
+$("#btnExport").onclick=async()=>{
+  toast("Preparando backup…");
+  const fotos=await readAllPhotos();
+  const payload={app:"rotina-hidrica", version:1, exportedAt:new Date().toISOString(), data:DB, fotos};
+  const d=new Date(), stamp=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
+  const blob=new Blob([JSON.stringify(payload)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download="backup-rotina-"+stamp+".json"; a.click();
+  setTimeout(()=>toast("Backup baixado ✔ Guarde no Drive/WhatsApp"),400);
+};
+$("#btnImport").onclick=()=>$("#importFile").click();
+$("#importFile").onchange=async()=>{
+  const f=$("#importFile").files[0]; if(!f)return;
+  try{
+    const obj=JSON.parse(await f.text());
+    if(!obj || !obj.data || !obj.data.days){ toast("Arquivo não reconhecido"); return; }
+    if(!confirm("Restaurar este backup? Os dados atuais deste aparelho serão substituídos pelos do arquivo.")) return;
+    DB=obj.data; if(!DB.config)DB.config={childName:"",metaMin:1100,metaMax:1300,wa:""};
+    localStorage.setItem(KEY, JSON.stringify(DB));
+    if(obj.fotos && idb){
+      const tx=idb.transaction("fotos","readwrite"), store=tx.objectStore("fotos");
+      Object.keys(obj.fotos).forEach(k=>store.put(obj.fotos[k],k));
+      tx.oncomplete=finishImport;
+    } else finishImport();
+  }catch(e){ toast("Não deu pra ler o arquivo"); }
+  $("#importFile").value="";
+};
+function finishImport(){ D=day(); renderAll(); refreshThumbs(); toast("Backup restaurado ✔"); }
+
+/* Armazenamento persistente + status */
+async function setupStorage(){
+  const box=$("#storeStatus"); if(!box)return;
+  let persisted=false;
+  try{
+    if(navigator.storage && navigator.storage.persist){
+      persisted = await navigator.storage.persisted ? await navigator.storage.persisted() : false;
+      if(!persisted && navigator.storage.persist) persisted = await navigator.storage.persist();
+    }
+  }catch(e){}
+  let usoTxt="";
+  try{
+    if(navigator.storage && navigator.storage.estimate){
+      const est=await navigator.storage.estimate();
+      usoTxt=" • usando "+(est.usage/1048576).toFixed(1)+" MB";
+    }
+  }catch(e){}
+  if(persisted){ box.textContent="🔒 Armazenamento protegido — o sistema não vai apagar seus dados"+usoTxt; }
+  else{ box.style.background="var(--amber-soft)"; box.style.color="var(--amber)";
+    box.textContent="⚠️ Dados salvos, mas sem proteção reforçada. Baixe backups com frequência"+usoTxt; }
+}
+$("#btnReset").onclick=()=>{
+  if(confirm("Zerar os registros de HOJE? As fotos de hoje também serão apagadas. Histórico de outros dias fica intacto.")){
+    DB.days[todayKey()]=blankDay(); D=day(); save();
+    SCHEDULE.forEach(s=>delPhoto(s.t));
+    renderAll(); toast("Registros de hoje zerados");
+  }
+};
+
+/* ---------- Header ---------- */
+function renderHeader(){
+  $("#hTitle").textContent = DB.config.childName ? ("Rotina — "+DB.config.childName) : "Rotina Hídrica";
+  $("#hDate").textContent = fmtDate();
+  $("#antibDay").value=D.antib||"";
+}
+
+/* ---------- Navegação ---------- */
+$$("nav button").forEach(b=>b.onclick=()=>{
+  $$("nav button").forEach(x=>x.classList.remove("on")); b.classList.add("on");
+  $$(".view").forEach(v=>v.classList.remove("on"));
+  $("#v-"+b.dataset.v).classList.add("on");
+  const waZone=$("#waZone");
+  waZone.style.display = (b.dataset.v==="hoje"||b.dataset.v==="reg")?"block":"none";
+  window.scrollTo(0,0);
+});
+
+/* ---------- Editor de Horários ---------- */
+function renderSchedEditor(){
+  const box=$("#schedEditor"); if(!box)return; box.innerHTML="";
+  const totalEl=document.createElement("div"); totalEl.className="sched-total";
+  totalEl.textContent="💧 Água planejada no dia: "+PLANNED+" ml";
+  box.appendChild(totalEl);
+  SCHEDULE.forEach((s,i)=>{
+    const row=document.createElement("div");
+    row.className="sched-row"+(s.crucial?" crucial":"");
+    row.innerHTML=`
+      <div class="sched-top">
+        <input type="time" data-f="t" value="${s.t}">
+        <input class="sched-ml" type="number" inputmode="numeric" data-f="ml" value="${s.ml||0}">
+        <span class="sched-ml-lbl">ml</span>
+        <button class="sched-del" data-del>✕</button>
+      </div>
+      <input class="sched-act" data-f="act" value="${(s.act||'').replace(/"/g,'&quot;')}" placeholder="O que fazer neste horário">
+      <div class="sched-flags">
+        <button class="sched-flag ${s.crucial?'on':''}" data-flag="crucial">⭐ Crucial</button>
+        <button class="sched-flag alarm ${s.alarme!==false?'on':''}" data-flag="alarme">🔔 Gera alarme</button>
+      </div>`;
+    row.querySelector('[data-f="t"]').onchange=e=>{ s.t=e.target.value||s.t; saveSchedule(); renderSchedEditor(); renderAll(); };
+    row.querySelector('[data-f="ml"]').onchange=e=>{ s.ml=parseInt(e.target.value)||0; saveSchedule(); renderSchedEditor(); renderAll(); };
+    row.querySelector('[data-f="act"]').onchange=e=>{ s.act=e.target.value; saveSchedule(); renderAll(); };
+    row.querySelector('[data-flag="crucial"]').onclick=()=>{ s.crucial=!s.crucial; saveSchedule(); renderSchedEditor(); renderAll(); };
+    row.querySelector('[data-flag="alarme"]').onclick=()=>{ s.alarme=(s.alarme===false)?true:false; saveSchedule(); renderSchedEditor(); };
+    row.querySelector('[data-del]').onclick=()=>{
+      if(confirm("Remover o horário das "+s.t+"?")){ SCHEDULE.splice(i,1); saveSchedule(); renderSchedEditor(); renderAll(); }
+    };
+    box.appendChild(row);
+  });
+}
+$("#schedAdd").onclick=()=>{
+  SCHEDULE.push({t:"12:00", ml:100, act:"Novo horário", guide:"", crucial:false, bath:false, alarme:true});
+  saveSchedule(); renderSchedEditor(); renderAll();
+  toast("Horário adicionado — ajuste a hora");
+};
+$("#schedReset").onclick=()=>{
+  if(confirm("Voltar aos horários originais do plano? Suas alterações de horário serão descartadas (os registros do dia continuam).")){
+    DB.config.schedule=null; loadSchedule(); saveSchedule(); renderSchedEditor(); renderAll();
+    toast("Horários restaurados");
+  }
+};
+
+/* ---------- Gerar agenda (.ics) ---------- */
+function icalEsc(t){ return String(t).replace(/([,;\\])/g,"\\$1").replace(/\n/g,"\\n"); }
+function buildICS(){
+  const d=new Date(), y=d.getFullYear(), mo=String(d.getMonth()+1).padStart(2,"0"), da=String(d.getDate()).padStart(2,"0");
+  const stamp=y+mo+da+"T000000";
+  const name=DB.config.childName||"criança";
+  const L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//RotinaHidrica//PT-BR//","CALSCALE:GREGORIAN"];
+  SCHEDULE.filter(s=>s.alarme!==false).forEach((s,i)=>{
+    const [h,m]=s.t.split(":");
+    const dtstart=y+mo+da+"T"+h+m+"00";
+    const title=(s.crucial?"⭐ ":"💧 ")+(s.act||"Vaso")+(s.ml?" ("+s.ml+"ml)":"");
+    L.push("BEGIN:VEVENT",
+      "UID:rh-"+h+m+"-"+Date.now()+"-"+i+"@rotina-hidrica",
+      "DTSTAMP:"+stamp,
+      "DTSTART:"+dtstart,
+      "DURATION:PT5M",
+      "RRULE:FREQ=DAILY",
+      "SUMMARY:"+icalEsc(name+" • "+title),
+      "DESCRIPTION:"+icalEsc(s.guide||s.act||""),
+      "BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:"+icalEsc(title),"TRIGGER:PT0S","END:VALARM",
+      "END:VEVENT");
+  });
+  L.push("END:VCALENDAR");
+  return L.join("\r\n");
+}
+$("#genICS").onclick=()=>{
+  const ics=buildICS();
+  const blob=new Blob([ics],{type:"text/calendar"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download="alarmes-rotina.ics"; a.click();
+  toast("Agenda baixada — abra e adicione ao calendário");
+};
+
+/* ---------- Links de alarme do Relógio (Android) ---------- */
+function renderClockLinks(){
+  const box=$("#clockLinks"); if(!box)return;
+  if(box._open){ box.innerHTML=""; box._open=false; return; }
+  box._open=true;
+  SCHEDULE.filter(s=>s.alarme!==false).forEach(s=>{
+    const [h,m]=s.t.split(":").map(Number);
+    const msg=encodeURIComponent((s.crucial?"⭐ ":"")+(s.act||"Vaso")+(s.ml?" • "+s.ml+"ml":""));
+    const href="intent:#Intent;action=android.intent.action.SET_ALARM;"
+      +"i.android.intent.extra.alarm.HOUR="+h+";"
+      +"i.android.intent.extra.alarm.MINUTES="+m+";"
+      +"S.android.intent.extra.alarm.MESSAGE="+msg+";"
+      +"B.android.intent.extra.alarm.VIBRATE=true;end";
+    const a=document.createElement("a");
+    a.className="clock-link"; a.href=href;
+    a.innerHTML=`<span class="t">${s.t}</span><span class="a">${s.crucial?'⭐ ':''}${(s.act||'Vaso')}${s.ml?' • '+s.ml+'ml':''}</span><span class="go">＋</span>`;
+    box.appendChild(a);
+  });
+  const note=document.createElement("div");
+  note.style.cssText="font-size:11px;color:var(--ink-soft);margin-top:9px;line-height:1.5";
+  note.textContent="Se um botão não abrir o Relógio, seu celular pode ter bloqueado o atalho — nesse caso use a agenda recorrente acima. Para repetir todo dia, ative a repetição na tela do alarme.";
+  box.appendChild(note);
+}
+$("#genClock").onclick=renderClockLinks;
+
+/* ---------- Render geral ---------- */
+function renderAll(){
+  renderHeader(); renderResp(); renderWater(); renderNow(); renderTimeline();
+  fixLabels(); renderCoco(); renderSinais(); $("#intercorr").value=D.intercorr||"";
+  renderHist(); renderSchedEditor(); loadConfigUI();
+}
+
+/* checagem de virada de dia */
+let curKey=todayKey();
+setInterval(()=>{
+  const k=todayKey();
+  if(k!==curKey){ curKey=k; D=day(); renderAll(); }
+  else { renderNow(); renderTimeline(); }
+}, 60000);
+
+try{ renderAll(); }catch(e){
+  var b=document.createElement("div");
+  b.style.cssText="padding:16px;margin:14px;background:#FBE7E2;color:#8A3327;border-radius:12px;font-size:13px";
+  b.textContent="Erro ao iniciar: "+e.message;
+  document.body.appendChild(b);
+}
+try{ setupStorage(); }catch(e){}
+// aviso se o salvamento estiver bloqueado (ex.: navegação privada no iPhone)
+setTimeout(function(){
+  try{ localStorage.setItem("__t","1"); localStorage.removeItem("__t"); }
+  catch(e){
+    var w=document.createElement("div");
+    w.style.cssText="position:fixed;bottom:78px;left:8px;right:8px;background:#D9922E;color:#fff;padding:11px 13px;border-radius:11px;font:600 12.5px -apple-system,sans-serif;z-index:9998;box-shadow:0 2px 10px rgba(0,0,0,.25)";
+    w.textContent="⚠️ Este navegador está bloqueando o salvamento. Saia da navegação privada/anônima e abra o app no Safari normal para os dados ficarem guardados.";
+    document.body.appendChild(w);
+  }
+},1500);
+</script>
+</body>
+</html>
